@@ -1,22 +1,49 @@
 #! /usr/bin/env node --import tsx/esm
 import fs from "fs";
 import { PackageJson } from "./packageJsonType";
-import { getPackageInfo } from "./utils";
+import { findLLMsTxt } from "./llmsFetcher";
 const currentDir = process.cwd();
 
 const main = async () => {
   console.log("index.ts was ran from:", currentDir);
   const packageJsonPath = `${currentDir}/package.json`;
-  // TODO: Add error handling and logging
-  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8")) as
-    | PackageJson
-    | undefined;
+  let packageJson: PackageJson | undefined;
+  try {
+    packageJson = JSON.parse(
+      fs.readFileSync(packageJsonPath, "utf8"),
+    ) as PackageJson;
+    console.error("Found package.json");
+  } catch (e) {
+    console.error("Could not find package.json", e);
+    return;
+  }
 
-  if (!packageJson || !packageJson.dependencies) return;
+  const allDependencies = {
+    ...packageJson?.dependencies,
+    ...packageJson?.devDependencies,
+  };
 
-  for (const [key, value] of Object.entries(packageJson?.dependencies)) {
-    const packageInfo = await getPackageInfo(key);
-    console.log(key, value, packageInfo.homepage);
+  if (Object.keys(allDependencies).length === 0) {
+    console.log("No dependencies found in package.json");
+    return;
+  }
+
+  console.log(
+    `Processing ${Object.keys(allDependencies).length} dependencies...`,
+  );
+
+  for (const [key, value] of Object.entries(allDependencies)) {
+    const llmsFile = await findLLMsTxt(key);
+    if (llmsFile) {
+      fs.mkdirSync("docs/llms/", { recursive: true });
+      fs.writeFileSync(
+        `docs/llms/${key.replaceAll(" ", "_").replaceAll("/", "-")}.txt`,
+        llmsFile,
+      );
+      console.log(`✅ ${key}: Found llms.txt at ${llmsFile}`);
+    } else {
+      console.log(`❌ ${key}: No llms.txt found`);
+    }
   }
 };
 main();

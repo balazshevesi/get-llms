@@ -70,7 +70,7 @@ export interface NpmOperationalInternal {
   tmp: string;
 }
 
-export interface NpmRegistryResponse {
+export interface NpmRegistry {
   name: string;
   version: string;
   type: string;
