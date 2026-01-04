@@ -14,8 +14,6 @@ const main = async () => {
 
   if (!packageJson || !packageJson.dependencies) return;
 
-  const packageInfo = {};
-
   for (const [key, value] of Object.entries(packageJson?.dependencies)) {
     const packageInfo = await getPackageInfo(key);
     console.log(key, value, packageInfo.homepage);
