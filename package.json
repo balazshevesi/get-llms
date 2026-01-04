@@ -1,0 +1,26 @@
+{
+  "name": "llms-fetcher",
+  "version": "1.0.0",
+  "description": "later",
+  "homepage": "https://github.com/balazshevesi/llms-fetcher#readme",
+  "bin": "./dist/bin/index.ts",
+  "bugs": {
+    "url": "https://github.com/balazshevesi/llms-fetcher/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/balazshevesi/llms-fetcher.git"
+  },
+  "license": "MIT",
+  "author": "Balzs Hevesi",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  }
+}
