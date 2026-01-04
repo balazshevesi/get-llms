@@ -12,7 +12,7 @@
     "url": "git+https://github.com/balazshevesi/llms-fetcher.git"
   },
   "license": "MIT",
-  "author": "Balzs Hevesi",
+  "author": "Balazs Hevesi",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
