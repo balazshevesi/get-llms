@@ -1,12 +1,40 @@
 import { NpmRegistry } from "./npmRegistryType";
 import { getPackageInfo } from "./utils";
 
+interface FetchResult {
+  location: string;
+  content: string;
+}
+
 // Check package.json "llms" key
-export const checkPackage = (s: NpmRegistry): string | void => s.llms && s.llms;
+export const checkPackage = async (
+  s: NpmRegistry,
+): Promise<FetchResult | null> => {
+  if (!s.llms) return null;
+
+  const llmsValue = s.llms;
+
+  if (llmsValue.startsWith("http://") || llmsValue.startsWith("https://")) {
+    try {
+      const response = await fetch(llmsValue);
+      const contentType = response.headers.get("content-type");
+      if (
+        response.ok &&
+        (contentType?.includes("text/plain") ||
+          contentType?.includes("text/markdown"))
+      ) {
+        return { location: llmsValue, content: await response.text() };
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+};
 
 export const checkStandardUrls = async (
   baseUrl: string,
-): Promise<string | null> => {
+): Promise<FetchResult | null> => {
   // Ensure no trailing slash
   const url = new URL(baseUrl);
   const possibilities = [
@@ -22,12 +50,14 @@ export const checkStandardUrls = async (
       const contentType = response.headers.get("content-type");
 
       if (response.ok) {
+        const text = await response.text();
+
         // Strict check: must be text/plain or markdown
         if (
           contentType?.includes("text/plain") ||
           contentType?.includes("text/markdown")
         ) {
-          return url;
+          return { location: url, content: text };
         }
 
         // Fallback: Check content if content-type is generic or missing
@@ -36,7 +66,6 @@ export const checkStandardUrls = async (
           continue; // Skip HTML responses
         }
 
-        const text = await response.text();
         // detailed check: shouldn't start with <!DOCTYPE html
         if (
           text.trim().toLowerCase().startsWith("<!doctype html") ||
@@ -44,7 +73,7 @@ export const checkStandardUrls = async (
         ) {
           continue;
         }
-        return url;
+        return { location: url, content: text };
       }
     } catch (e) {
       // Ignore network errors, try next
@@ -55,7 +84,7 @@ export const checkStandardUrls = async (
 
 export const handleGithub = async (
   homepage: string,
-): Promise<string | null> => {
+): Promise<FetchResult | null> => {
   const match = homepage.match(/github\.com\/([^\/]+)\/([^\/]+)/);
   if (!match) return null;
   const [, owner, repo] = match;
@@ -87,10 +116,11 @@ export const handleGithub = async (
   // Look for links containing "docs"
   // Markdown link regex: \[([^\]]*)\]\(([^)]+)\)
   const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
-  let linkMatch;
+  let linkMatch: RegExpExecArray | null = linkRegex.exec(readmeContent);
 
-  while ((linkMatch = linkRegex.exec(readmeContent)) !== null) {
+  while (linkMatch !== null) {
     const [_, text, url] = linkMatch;
+    linkMatch = linkRegex.exec(readmeContent);
     // Check if text or url contains "docs" (flowchart says "mention the word 'docs' in a hyperlink")
     // It implies the anchor text or the URL itself could hint at docs?
     // "does the github 'readme.txt' mention the word 'docs' in a hyperlink?"
@@ -132,12 +162,13 @@ export const handleGithub = async (
 
 export const checkHomepage = async (
   homepage: string,
-): Promise<string | null> => {
+): Promise<FetchResult | null> => {
   if (!homepage) return null;
 
   if (homepage.includes("github.com")) {
     const githubResult = await handleGithub(homepage);
-    if (githubResult) return githubResult;
+    if (githubResult)
+      return { location: githubResult.location, content: githubResult.content };
     // Fallback to checking standard URLs on the repo if scraping fails?
     // actually flowchart says: if github -> scrape README -> if link found -> check standard urls of THAT link
     //                                      -> if no link found -> NOFILE
@@ -160,18 +191,16 @@ export const checkHomepage = async (
 
 export const findLLMsTxt = async (
   packageName: string,
-): Promise<string | null> => {
+): Promise<FetchResult | null> => {
   try {
     const info = await getPackageInfo(packageName);
 
     // 1. Check package.json "llms" key
-    const fromPackageJson = checkPackage(info);
+    const fromPackageJson = await checkPackage(info);
     if (fromPackageJson) return fromPackageJson;
 
     // 2. Check homepage
-    if (info.homepage) {
-      return await checkHomepage(info.homepage);
-    }
+    if (info.homepage) return await checkHomepage(info.homepage);
 
     return null;
   } catch (error) {

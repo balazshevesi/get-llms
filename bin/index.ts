@@ -38,9 +38,9 @@ const main = async () => {
       fs.mkdirSync("docs/llms/", { recursive: true });
       fs.writeFileSync(
         `docs/llms/${key.replaceAll(" ", "_").replaceAll("/", "-")}.txt`,
-        llmsFile,
+        llmsFile.content,
       );
-      console.log(`✅ ${key}: Found llms.txt at ${llmsFile}`);
+      console.log(`✅ ${key}: Found llms.txt at ${llmsFile.location}`);
     } else {
       console.log(`❌ ${key}: No llms.txt found`);
     }
