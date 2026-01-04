@@ -1,0 +1,26 @@
+{
+  "name": "auto-applications-backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --hot index.ts",
+    "db:push": "bunx drizzle-kit push",
+    "db:seed": "bun run db/seed.ts",
+    "db:checkpoint": "sqlite3 db/auto-applications.db \"PRAGMA wal_checkpoint(TRUNCATE);\""
+  },
+  "dependencies": {
+    "@hono/standard-validator": "0.2.1",
+    "@openrouter/ai-sdk-provider": "^1.5.4",
+    "ai": "^5.0",
+    "drizzle-orm": "^0.45.1",
+    "hono": "4.11.1",
+    "iso-3166-1": "2.1.1",
+    "puppeteer": "24.34.0",
+    "zod": "4.2.1"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.6",
+    "drizzle-kit": "^0.31.8",
+    "typescript": "^5.9.3"
+  }
+}
