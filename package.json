@@ -2,18 +2,18 @@
   "name": "get-llms",
   "version": "1.0.3",
   "description": "CLI tool for fetching llms.txt files for all of your dependencies",
-  "homepage": "https://github.com/balazshevesi/llms-fetcher#readme",
+  "homepage": "https://github.com/balazshevesi/get-llms#readme",
   "bin": {
     "get-llms": "dist/bin/index.js"
   },
   "bugs": {
-    "url": "https://github.com/balazshevesi/llms-fetcher/issues"
+    "url": "https://github.com/balazshevesi/get-llms/issues"
   },
   "llms": "https://raw.githubusercontent.com/balazshevesi/get-llms/main/README.md",
   "llmsFull": "https://raw.githubusercontent.com/balazshevesi/get-llms/main/README.md",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/balazshevesi/llms-fetcher.git"
+    "url": "git+https://github.com/balazshevesi/get-llms.git"
   },
   "license": "MIT",
   "author": "Balazs Hevesi",

@@ -3,8 +3,16 @@
 
 ## Install
 
+install it globally
+
 ```bash
 npm install -g get-llms
+``` p
+
+or just run it with npx
+
+```bash
+npx get-llms
 ```
 
 ## Usage
@@ -226,7 +234,7 @@ By default, files are saved to:
 ```
 docs/llms/
   ├── zod.txt
-  ├── lodash.txt
+  ├── react-native.txt
   └── [package-name].txt
 ```
 
