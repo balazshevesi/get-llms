@@ -1,7 +1,7 @@
 {
   "name": "get-llms",
   "version": "1.0.0",
-  "description": "later",
+  "description": "npx command for fetching llms.txt files for all packages from package.json",
   "homepage": "https://github.com/balazshevesi/llms-fetcher#readme",
   "bin": "./bin/index.ts",
   "bugs": {
@@ -14,7 +14,6 @@
   "license": "MIT",
   "author": "Balazs Hevesi",
   "type": "module",
-  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
@@ -30,5 +29,16 @@
   },
   "dependencies": {
     "commander": "^14.0.2"
-  }
+  },
+  "keywords": [
+    "llms",
+    "get-llms",
+    "llms.txt",
+    "fetch",
+    "package",
+    "script",
+    "cli",
+    "command",
+    "llms-fetcher"
+  ]
 }
