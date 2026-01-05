@@ -3,11 +3,11 @@
 
 ## Install
 
-install it globally
+Install it globally
 
 ```bash
 npm install -g get-llms
-``` p
+```
 
 or just run it with npx
 
