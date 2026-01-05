@@ -1,6 +1,6 @@
 {
   "name": "get-llms",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "CLI tool for fetching llms.txt files for all of your dependencies",
   "homepage": "https://github.com/balazshevesi/llms-fetcher#readme",
   "bin": {
@@ -36,7 +36,7 @@
     "commander": "^14.0.2"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "keywords": [
     "get-llms",

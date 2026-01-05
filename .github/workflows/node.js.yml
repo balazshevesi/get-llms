@@ -1,9 +1,9 @@
 name: Run tests
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 jobs:
   test:
     name: Test job
@@ -11,19 +11,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [20.x, 22.x]
     steps:
-    
-    - name: Checkout
-      uses: actions/checkout@v4
-    
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-    
-    - name: Instal dependencies
-      run: npm i
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Run tests
-      run: npm run test
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Instal dependencies
+        run: npm i
+
+      - name: Run tests
+        run: npm run test
