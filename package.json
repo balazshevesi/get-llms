@@ -17,11 +17,15 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",
-    "tsx": "^4.21.0"
+    "msw": "^2.12.7",
+    "tsx": "^4.21.0",
+    "vitest": "^4.0.16"
   },
   "dependencies": {
     "commander": "^14.0.2"
