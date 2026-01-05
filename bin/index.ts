@@ -2,16 +2,12 @@
 import fs from "fs";
 import path from "path";
 import { Command } from "commander";
-import { PackageJson } from "./packageJsonType";
+import { PackageJson } from "./types/packageJsonType";
 import { findLLMsTxt } from "./llmsFetcher";
-import { generateFilename } from "./utils";
-import { logger } from "./logger";
-import {
-  CLIOptions,
-  DependencyType,
-  FallbackStrategy,
-  VerbosityLevel,
-} from "./types";
+import { generateFilename } from "./utils/utils";
+import { logger } from "./utils/logger";
+import { parseDeps, getDependencies } from "./utils/cliHelpers";
+import { CLIOptions, FallbackStrategy, VerbosityLevel } from "./types/types";
 import { DEFAULT_OPTIONS } from "./defaults";
 
 const currentDir = process.cwd();
@@ -30,51 +26,6 @@ interface ParsedOptions {
   slashReplace: string;
   atReplace: string;
 }
-
-const parseDeps = (depsString: string): DependencyType[] => {
-  const validDeps: DependencyType[] = [
-    "prod",
-    "dev",
-    "peer",
-    "optional",
-    "all",
-  ];
-  const deps = depsString.split(",").map((d) => d.trim().toLowerCase());
-
-  const result: DependencyType[] = [];
-  for (const dep of deps) {
-    if (validDeps.includes(dep as DependencyType)) {
-      result.push(dep as DependencyType);
-    } else {
-      logger.warn(`Unknown dependency type: ${dep}`);
-    }
-  }
-
-  return result.length > 0 ? result : ["all"];
-};
-
-const getDependencies = (
-  packageJson: PackageJson,
-  depTypes: DependencyType[],
-): Record<string, string> => {
-  const result: Record<string, string> = {};
-
-  const includeAll = depTypes.includes("all");
-
-  if (includeAll || depTypes.includes("prod"))
-    Object.assign(result, packageJson.dependencies || {});
-
-  if (includeAll || depTypes.includes("dev"))
-    Object.assign(result, packageJson.devDependencies || {});
-
-  if (includeAll || depTypes.includes("peer"))
-    Object.assign(result, packageJson.peerDependencies || {});
-
-  if (includeAll || depTypes.includes("optional"))
-    Object.assign(result, packageJson.optionalDependencies || {});
-
-  return result;
-};
 
 const main = async (packages: string[], options: CLIOptions): Promise<void> => {
   // Set verbosity first

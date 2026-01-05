@@ -1,7 +1,7 @@
-import { NpmRegistry } from "./npmRegistryType";
-import { getPackageInfo } from "./utils";
-import { FallbackStrategy } from "./types";
-import { logger } from "./logger";
+import { NpmRegistry } from "./types/npmRegistryType";
+import { getPackageInfo } from "./utils/utils";
+import { FallbackStrategy } from "./types/types";
+import { logger } from "./utils/logger";
 
 export interface FetchResult {
   location: string;

@@ -1,4 +1,4 @@
-import { CLIOptions } from "./types";
+import { CLIOptions } from "./types/types";
 
 export const DEFAULT_OPTIONS: CLIOptions = {
   packagePath: "./package.json",

@@ -1,4 +1,4 @@
-import { VerbosityLevel } from "./types";
+import { VerbosityLevel } from "../types/types";
 
 class Logger {
   private verbosity: VerbosityLevel = "normal";

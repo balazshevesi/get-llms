@@ -1,6 +1,6 @@
-import { DEFAULT_OPTIONS } from "./defaults";
-import { NpmRegistry } from "./npmRegistryType";
-import { SanitizerOptions } from "./types";
+import { DEFAULT_OPTIONS } from "../defaults";
+import { NpmRegistry } from "../types/npmRegistryType";
+import { SanitizerOptions } from "../types/types";
 
 export const getPackageInfo = async (packageName: string) => {
   const response = await fetch(

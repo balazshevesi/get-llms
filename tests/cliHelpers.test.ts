@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { parseDeps, getDependencies } from "../bin/cliHelpers";
-import { PackageJson } from "../bin/packageJsonType";
-import { logger } from "../bin/logger";
+import { parseDeps, getDependencies } from "../bin/utils/cliHelpers";
+import { PackageJson } from "../bin/types/packageJsonType";
+import { logger } from "../bin/utils/logger";
 
 // Mock logger to prevent console output during tests
-vi.mock("../bin/logger", () => ({
+vi.mock("../bin/utils/logger", () => ({
   logger: {
     warn: vi.fn(),
     error: vi.fn(),

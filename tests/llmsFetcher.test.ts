@@ -8,10 +8,10 @@ import {
   checkHomepage,
   fetchReadmeFromGithub,
 } from "../bin/llmsFetcher";
-import { NpmRegistry } from "../bin/npmRegistryType";
+import { NpmRegistry } from "../bin/types/npmRegistryType";
 
 // Mock logger to prevent console output during tests
-vi.mock("../bin/logger", () => ({
+vi.mock("../bin/utils/logger", () => ({
   logger: {
     warn: vi.fn(),
     error: vi.fn(),

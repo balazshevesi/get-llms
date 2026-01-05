@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { sanitizeFilename, generateFilename } from "../bin/utils";
+import { sanitizeFilename, generateFilename } from "../bin/utils/utils";
 import { DEFAULT_OPTIONS } from "../bin/defaults";
 
 describe("sanitizeFilename", () => {
@@ -84,24 +84,24 @@ describe("generateFilename", () => {
 
   describe("with default pattern", () => {
     it("should generate simple filenames", () => {
-      expect(generateFilename("{name}", "lodash", "txt", defaultSanitizer)).toBe(
-        "lodash.txt",
-      );
+      expect(
+        generateFilename("{name}", "lodash", "txt", defaultSanitizer),
+      ).toBe("lodash.txt");
     });
 
     it("should handle different extensions", () => {
       expect(generateFilename("{name}", "lodash", "md", defaultSanitizer)).toBe(
         "lodash.md",
       );
-      expect(generateFilename("{name}", "lodash", "json", defaultSanitizer)).toBe(
-        "lodash.json",
-      );
+      expect(
+        generateFilename("{name}", "lodash", "json", defaultSanitizer),
+      ).toBe("lodash.json");
     });
 
     it("should handle extension with leading dot", () => {
-      expect(generateFilename("{name}", "lodash", ".txt", defaultSanitizer)).toBe(
-        "lodash.txt",
-      );
+      expect(
+        generateFilename("{name}", "lodash", ".txt", defaultSanitizer),
+      ).toBe("lodash.txt");
     });
 
     it("should sanitize package names", () => {
@@ -126,7 +126,12 @@ describe("generateFilename", () => {
 
     it("should handle complex patterns", () => {
       expect(
-        generateFilename("pkg-{name}-reference", "react", "md", defaultSanitizer),
+        generateFilename(
+          "pkg-{name}-reference",
+          "react",
+          "md",
+          defaultSanitizer,
+        ),
       ).toBe("pkg-react-reference.md");
     });
 
