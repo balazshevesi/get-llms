@@ -4,5 +4,7 @@ bun.lock
 local-test
 coverage
 
+.github
 tests
 bin
+vitest.config.ts
