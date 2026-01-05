@@ -1,6 +1,6 @@
 {
   "name": "get-llms",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CLI tool for fetching llms.txt files for all of your dependencies",
   "homepage": "https://github.com/balazshevesi/llms-fetcher#readme",
   "bin": {
@@ -19,7 +19,7 @@
   "author": "Balazs Hevesi",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias --resolve-full-paths",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
@@ -28,6 +28,8 @@
     "@types/node": "^25.0.3",
     "@vitest/coverage-v8": "^4.0.16",
     "msw": "^2.12.7",
+    "tsc-alias": "^1.8.16",
+    "tsx": "^4.21.0",
     "vitest": "^4.0.16"
   },
   "dependencies": {
