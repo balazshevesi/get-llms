@@ -22,7 +22,7 @@ get-llms
 You can fetch specific packages without needing a `package.json`:
 
 ```bash
-get-llms zod lodash react
+get-llms zod react-native
 ```
 
 ## CLI Options
