@@ -1,7 +1,7 @@
 {
   "name": "get-llms",
-  "version": "1.0.0",
-  "description": "npx command for fetching llms.txt files for all packages from package.json",
+  "version": "1.0.1",
+  "description": "CLI tool for fetching llms.txt files for all of your dependencies",
   "homepage": "https://github.com/balazshevesi/llms-fetcher#readme",
   "bin": {
     "get-llms": "dist/bin/index.js"
@@ -9,6 +9,8 @@
   "bugs": {
     "url": "https://github.com/balazshevesi/llms-fetcher/issues"
   },
+  "llms": "https://raw.githubusercontent.com/balazshevesi/get-llms/main/README.md",
+  "llmsFull": "https://raw.githubusercontent.com/balazshevesi/get-llms/main/README.md",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/balazshevesi/llms-fetcher.git"
@@ -35,8 +37,10 @@
     "node": ">=18.0.0"
   },
   "keywords": [
-    "llms",
     "get-llms",
+    "get-llms-cli",
+    "get-llms-txt",
+    "llms",
     "llms.txt",
     "fetch",
     "package",

@@ -1,5 +1,11 @@
-# llms-fetcher
+# get-llms
 📚 CLI tool to fetch `llms.txt` files for your npm dependencies
+
+## Install
+
+```bash
+npm install -g get-llms
+```
 
 ## Usage
 
@@ -8,7 +14,7 @@
 Fetch `llms.txt` files for all dependencies in your `package.json`:
 
 ```bash
-llms-fetcher
+get-llms
 ```
 
 ### Fetch Specific Packages
@@ -16,7 +22,7 @@ llms-fetcher
 You can fetch specific packages without needing a `package.json`:
 
 ```bash
-llms-fetcher zod lodash react
+get-llms zod lodash react
 ```
 
 ## CLI Options
@@ -27,7 +33,7 @@ llms-fetcher zod lodash react
 Specify a custom path to `package.json` (default: `./package.json`)
 
 ```bash
-llms-fetcher --package ./packages/core/package.json
+get-llms --package ./packages/core/package.json
 ```
 
 #### `--deps <types>`
@@ -39,15 +45,15 @@ Filter which dependency types to include. Comma-separated list of:
 - `all` - all dependencies (default)
 
 ```bash
-llms-fetcher --deps prod,dev        # Only production and dev dependencies
-llms-fetcher --deps prod            # Only production dependencies
+get-llms --deps prod,dev        # Only production and dev dependencies
+get-llms --deps prod            # Only production dependencies
 ```
 
 #### Positional Arguments
 Specify packages directly to fetch:
 
 ```bash
-llms-fetcher react @types/react
+get-llms react @types/react
 ```
 
 ### Output Options
@@ -56,21 +62,21 @@ llms-fetcher react @types/react
 Custom output directory (default: `docs/llms`)
 
 ```bash
-llms-fetcher --output ./context/dependencies
+get-llms --output ./context/dependencies
 ```
 
 #### `--filename, -f <pattern>`
 Filename pattern for output files. Use `{name}` as a placeholder for the package name (default: `{name}`)
 
 ```bash
-llms-fetcher --filename "llms-{name}"
+get-llms --filename "llms-{name}"
 ```
 
 #### `--extension, -e <ext>`
 File extension for output files (default: `txt`)
 
 ```bash
-llms-fetcher --extension md
+get-llms --extension md
 ```
 
 ### Behavior Options
@@ -79,7 +85,7 @@ llms-fetcher --extension md
 Preview what would be done without writing any files
 
 ```bash
-llms-fetcher --dry-run
+get-llms --dry-run
 ```
 
 #### `--fallback <strategy>`
@@ -90,15 +96,15 @@ Strategy when `llms.txt` is not found:
 - `skip` - Same as `none`
 
 ```bash
-llms-fetcher --fallback readme     # Use README.md as fallback
-llms-fetcher --fallback empty      # Create empty files
+get-llms --fallback readme     # Use README.md as fallback
+get-llms --fallback empty      # Create empty files
 ```
 
 ##### Fallback Examples
 
 **With readme fallback:**
 ```bash
-llms-fetcher --fallback readme
+get-llms --fallback readme
 ```
 
 Results in:
@@ -108,7 +114,7 @@ Results in:
 
 **With empty fallback:**
 ```bash
-llms-fetcher --fallback empty
+get-llms --fallback empty
 ```
 
 Creates files containing:
@@ -124,7 +130,7 @@ No llms.txt found for this package.
 Only show errors (minimal output)
 
 ```bash
-llms-fetcher --quiet
+get-llms --quiet
 ```
 
 #### `--verbose, -v`
@@ -134,7 +140,7 @@ Show detailed output including:
 - Debug information
 
 ```bash
-llms-fetcher --verbose
+get-llms --verbose
 ```
 
 **Note:** If both `-q` and `-v` are specified, the last one wins.
@@ -147,21 +153,21 @@ Customize how special characters in package names are sanitized:
 Character to replace spaces in filenames (default: `_`)
 
 ```bash
-llms-fetcher --space-replace "_"
+get-llms --space-replace "_"
 ```
 
 #### `--slash-replace <char>`
 Character to replace slashes in filenames (default: `-`)
 
 ```bash
-llms-fetcher --slash-replace "-"
+get-llms --slash-replace "-"
 ```
 
 #### `--at-replace <char>`
 Character to replace `@` in scoped package names (default: empty string)
 
 ```bash
-llms-fetcher --at-replace ""
+get-llms --at-replace ""
 ```
 
 **Example:** `@types/node` becomes `types-node.txt` with default settings
@@ -170,7 +176,7 @@ llms-fetcher --at-replace ""
 
 ### Example 1: Fetch with readme fallback and save as markdown
 ```bash
-llms-fetcher \
+get-llms \
   --fallback readme \
   --extension md \
   --output ./docs/handbook
@@ -178,7 +184,7 @@ llms-fetcher \
 
 ### Example 2: Only production dependencies with custom naming
 ```bash
-llms-fetcher \
+get-llms \
   --deps prod \
   --filename "{name}-reference" \
   --extension txt \
@@ -187,7 +193,7 @@ llms-fetcher \
 
 ### Example 3: Fetch specific packages with custom sanitization
 ```bash
-llms-fetcher @types/node @types/react \
+get-llms @types/node @types/react \
   --space-replace "_" \
   --slash-replace "_" \
   --at-replace "at_"
@@ -199,7 +205,7 @@ This might create:
 
 ### Example 4: Verbose dry run with all dependencies
 ```bash
-llms-fetcher \
+get-llms \
   --deps all \
   --dry-run \
   --verbose
@@ -207,7 +213,7 @@ llms-fetcher \
 
 ### Example 5: Complex workflow - production deps with empty fallback
 ```bash
-llms-fetcher \
+get-llms \
   --deps prod \
   --fallback empty \
   --output ./docs/llms-production \
@@ -262,4 +268,4 @@ flowchart TD
 
 ## Contributing
 
-Issues and contributions welcome! Report bugs at: https://github.com/balazshevesi/llms-fetcher/issues
+Issues and contributions welcome! Report bugs at: https://github.com/balazshevesi/get-llms/issues
