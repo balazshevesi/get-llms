@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "npx command for fetching llms.txt files for all packages from package.json",
   "homepage": "https://github.com/balazshevesi/llms-fetcher#readme",
-  "bin": "./dist/bin/index.js",
+  "bin": {
+    "get-llms": "dist/bin/index.js"
+  },
   "bugs": {
     "url": "https://github.com/balazshevesi/llms-fetcher/issues"
   },
