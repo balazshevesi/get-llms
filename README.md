@@ -1,5 +1,5 @@
 # get-llms
-📚 CLI tool to fetch `llms.txt` files for your npm dependencies
+📚 CLI tool to fetch [`llms.txt`](https://llmstxt.org/) files for your npm dependencies
 
 ## Install
 
@@ -251,19 +251,19 @@ The tool searches for `llms.txt` files in this order:
 
 ```mermaid
 flowchart TD
-    A([package]) --> B{is there an 'llms'<br/>key in the<br/>'package.json'?}
+    A([package]) --> B{is there an 'llms' key in the 'package.json'?}
 
     B -- yes --> FOUND([we've found it])
-    B -- no --> C{is the package<br/>homepage a<br/>github link?}
+    B -- no --> C{is the package homepage a github link?}
 
-    C -- yes --> D{does the github<br/>'readme.txt' mention<br/>the word 'docs' in a<br/>hyperlink?}
-    C -- no --> E{does 'link/llms.txt'<br/>return a txt file?}
+    C -- yes --> D{does the github 'readme.txt' mention the word 'docs' in a hyperlink?}
+    C -- no --> E{does 'link/llms.txt' return a txt file?}
 
     D -- yes --> E
-    D -- no --> NOFILE([there likely isn't a<br/>'llms.txt'<br/>for that package<br/><br/>Either use the 'README.txt',<br/>or use an external service<br/>like context7])
+    D -- no --> NOFILE([there likely isn't a 'llms.txt' for that package Either use the 'README.txt', or use an external service like context7])
 
     E -- yes --> FOUND
-    E -- no --> F{does 'link/docs/llms.txt'<br/>return a txt file?}
+    E -- no --> F{does 'link/docs/llms.txt' return a txt file?}
 
     F -- yes --> FOUND
     F -- no --> NOFILE
@@ -276,4 +276,39 @@ flowchart TD
 
 ## Contributing
 
-Issues and contributions welcome! Report bugs at: https://github.com/balazshevesi/get-llms/issues
+Issues and contributions welcome! Report bugs at: [https://github.com/balazshevesi/get-llms/issues](https://github.com/balazshevesi/get-llms/issues), or contact me on twitter [@balazs_hevesi](https://x.com/balazs_hevesi)
+
+## Roadmap and vision
+
+The [`llms.txt`](https://llmstxt.org/) spec is still young and un-opinionated. Some packages and some documentation-sites already ship an `llms.txt` file, others don’t, and the ones that do sometimes invent their own markdown dialect. 
+
+As adoption grows we expect the format to stabilise, turning “antigenic-coding” into a first-class workflow.
+
+### Specifying `llms.txt`
+
+Today the cleanest way to publish documentation with an `llms.txt` is to add an `"llms"` key to `package.json`:
+
+```json
+"llms": "./README.txt"
+```
+
+When the registry starts indexing that field we’ll be able to fetch the *exact* documentation that and feed it into the coding-agent's context. (this will also require the URLs for fetching documentation versions to be standardized)
+
+Example: [zod](https://github.com/colinhacks/zod/blob/main/packages/zod/package.json#L75)
+
+### Practical integration
+
+Because the format is still fluid, treat `llms.txt` as *best-effort* documentation:
+
+- 90 % of the time an agent can slurp the file directly.  
+- If it’s 25k tokens or more, you might want to fall back to a cache, a RAG layer, or a service such as [Context7](https://context7.com/). (AI-agents such have a limit on the file sizes they're willing to read, and will truncate the file to fit their context window)
+
+### Why this will matter tomorrow
+
+Vibe-coded apps are about to become legacy and enter a maintenance phase. When that happens, ai coding-agents will need the docs for **old** versions of the packages. `llms.txt` is the lowest-friction way to provide the ai with the correct documentation.
+
+External services (like Context7) are great, but bundling the required context is simpler, cheaper.
+
+## License
+
+[MIT License](LICENSE)

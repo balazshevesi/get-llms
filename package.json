@@ -1,6 +1,6 @@
 {
   "name": "get-llms",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "CLI tool for fetching llms.txt files for all of your dependencies",
   "homepage": "https://github.com/balazshevesi/get-llms#readme",
   "bin": {
