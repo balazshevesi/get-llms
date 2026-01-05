@@ -1,10 +1,38 @@
 import { NpmRegistry } from "./npmRegistryType";
 import { getPackageInfo } from "./utils";
+import { FallbackStrategy } from "./types";
+import { logger } from "./logger";
 
-interface FetchResult {
+export interface FetchResult {
   location: string;
   content: string;
+  isFallback?: boolean;
+  fallbackType?: "readme" | "empty";
 }
+
+/**
+ * Clean up a GitHub URL to extract owner/repo
+ * Handles various formats:
+ * - https://github.com/owner/repo
+ * - https://github.com/owner/repo.git
+ * - https://github.com/owner/repo#readme
+ * - git+https://github.com/owner/repo.git
+ */
+const parseGitHubUrl = (
+  url: string,
+): { owner: string; repo: string } | null => {
+  // Remove git+ prefix if present
+  let cleanUrl = url.replace(/^git\+/, "");
+  // Remove .git suffix if present
+  cleanUrl = cleanUrl.replace(/\.git$/, "");
+  // Remove hash fragments
+  cleanUrl = cleanUrl.replace(/#.*$/, "");
+
+  const match = cleanUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+  if (!match) return null;
+
+  return { owner: match[1], repo: match[2] };
+};
 
 // Check package.json "llms" key
 export const checkPackage = async (
@@ -16,6 +44,7 @@ export const checkPackage = async (
 
   if (llmsValue.startsWith("http://") || llmsValue.startsWith("https://")) {
     try {
+      logger.verbose(`Checking package llms field: ${llmsValue}`);
       const response = await fetch(llmsValue);
       const contentType = response.headers.get("content-type");
       if (
@@ -26,6 +55,7 @@ export const checkPackage = async (
         return { location: llmsValue, content: await response.text() };
       }
     } catch (e) {
+      logger.debug(`Failed to fetch from package llms field: ${e}`);
       return null;
     }
   }
@@ -35,17 +65,20 @@ export const checkPackage = async (
 export const checkStandardUrls = async (
   baseUrl: string,
 ): Promise<FetchResult | null> => {
-  // Ensure no trailing slash
+  // Ensure no trailing slash and clean URL
   const url = new URL(baseUrl);
+  // Remove trailing slash from href
+  const cleanHref = url.href.replace(/\/+$/, "");
   const possibilities = [
-    `${url.href}/llms.txt`,
-    `${url.href}/docs/llms.txt`,
+    `${cleanHref}/llms.txt`,
+    `${cleanHref}/docs/llms.txt`,
     `${url.origin}/llms.txt`,
     `${url.origin}/docs/llms.txt`,
   ];
 
   for (const url of possibilities) {
     try {
+      logger.verbose(`Checking standard URL: ${url}`);
       const response = await fetch(url, { method: "GET" });
       const contentType = response.headers.get("content-type");
 
@@ -76,18 +109,52 @@ export const checkStandardUrls = async (
         return { location: url, content: text };
       }
     } catch (e) {
+      logger.debug(`Failed to fetch ${url}: ${e}`);
       // Ignore network errors, try next
     }
   }
   return null;
 };
 
+export const fetchReadmeFromGithub = async (
+  homepage: string,
+): Promise<FetchResult | null> => {
+  const parsed = parseGitHubUrl(homepage);
+  if (!parsed) return null;
+  const { owner, repo } = parsed;
+
+  const branches = ["main", "master"];
+  const filenames = ["README.md", "readme.md", "README.txt", "readme.txt"];
+
+  for (const branch of branches) {
+    for (const filename of filenames) {
+      const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${filename}`;
+      try {
+        logger.verbose(`Checking GitHub README: ${rawUrl}`);
+        const res = await fetch(rawUrl);
+        if (res.ok) {
+          return {
+            location: rawUrl,
+            content: await res.text(),
+            isFallback: true,
+            fallbackType: "readme",
+          };
+        }
+      } catch {
+        continue;
+      }
+    }
+  }
+
+  return null;
+};
+
 export const handleGithub = async (
   homepage: string,
 ): Promise<FetchResult | null> => {
-  const match = homepage.match(/github\.com\/([^\/]+)\/([^\/]+)/);
-  if (!match) return null;
-  const [, owner, repo] = match;
+  const parsed = parseGitHubUrl(homepage);
+  if (!parsed) return null;
+  const { owner, repo } = parsed;
 
   const branches = ["main", "master"];
   const filenames = ["README.md", "readme.md", "README.txt", "readme.txt"];
@@ -100,6 +167,7 @@ export const handleGithub = async (
     for (const filename of filenames) {
       const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${filename}`;
       try {
+        logger.verbose(`Checking GitHub for README: ${rawUrl}`);
         const res = await fetch(rawUrl);
         if (res.ok) {
           readmeContent = await res.text();
@@ -152,6 +220,7 @@ export const handleGithub = async (
       }
 
       // Check this URL
+      logger.verbose(`Found docs link, checking: ${absoluteUrl}`);
       const result = await checkStandardUrls(absoluteUrl);
       if (result) return result;
     }
@@ -189,10 +258,18 @@ export const checkHomepage = async (
   return checkStandardUrls(homepage);
 };
 
+export interface FindLLMsOptions {
+  fallback?: FallbackStrategy;
+}
+
 export const findLLMsTxt = async (
   packageName: string,
+  options: FindLLMsOptions = {},
 ): Promise<FetchResult | null> => {
+  const { fallback = "none" } = options;
+
   try {
+    logger.verbose(`Fetching package info for: ${packageName}`);
     const info = await getPackageInfo(packageName);
 
     // 1. Check package.json "llms" key
@@ -200,11 +277,44 @@ export const findLLMsTxt = async (
     if (fromPackageJson) return fromPackageJson;
 
     // 2. Check homepage
-    if (info.homepage) return await checkHomepage(info.homepage);
+    if (info.homepage) {
+      const fromHomepage = await checkHomepage(info.homepage);
+      if (fromHomepage) return fromHomepage;
+    }
+
+    // 3. Apply fallback strategy if no llms.txt found
+    if (fallback === "readme" && info.homepage) {
+      logger.verbose(`Applying readme fallback for: ${packageName}`);
+      // Try to fetch README from GitHub
+      if (info.homepage.includes("github.com")) {
+        const readmeResult = await fetchReadmeFromGithub(info.homepage);
+        if (readmeResult) return readmeResult;
+      }
+
+      // Try to get README from repository field
+      const repoUrl =
+        typeof info.repository === "string"
+          ? info.repository
+          : info.repository?.url;
+
+      if (repoUrl && repoUrl.includes("github.com")) {
+        const readmeResult = await fetchReadmeFromGithub(repoUrl);
+        if (readmeResult) return readmeResult;
+      }
+    }
+
+    if (fallback === "empty") {
+      return {
+        location: "fallback:empty",
+        content: `# ${packageName}\n\nNo llms.txt found for this package.\n`,
+        isFallback: true,
+        fallbackType: "empty",
+      };
+    }
 
     return null;
   } catch (error) {
-    console.error(`Error fetching info for ${packageName}:`, error);
+    logger.debug(`Error fetching info for ${packageName}:`, error);
     return null;
   }
 };
